@@ -1,0 +1,133 @@
+﻿name: redpanda-quickstart
+
+networks:
+  redpanda_network:
+    driver: bridge
+
+volumes:
+  redpanda-0:
+  pgdata:
+
+services:
+  ###############################################################
+  # 1. REDPANDA (Kafka broker)
+  ###############################################################
+  redpanda-0:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.3.1
+    container_name: redpanda-0
+    command:
+      - redpanda
+      - start
+      - --kafka-addr PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda-0:9092
+      - --pandaproxy-addr PLAINTEXT://0.0.0.0:8082
+      - --advertise-pandaproxy-addr PLAINTEXT://redpanda-0:8082
+      - --schema-registry-addr PLAINTEXT://0.0.0.0:8081
+      - --rpc-addr redpanda-0:33145
+      - --advertise-rpc-addr redpanda-0:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+    ports:
+      - "9092:9092"
+      - "8081:8081"
+      - "8082:8082"
+      - "9644:9644"
+    volumes:
+      - redpanda-0:/var/lib/redpanda/data
+    networks:
+      - redpanda_network
+
+  ###############################################################
+  # 2. REDPANDA CONSOLE (UI Kafka)
+  ###############################################################
+  console:
+    image: docker.redpanda.com/redpandadata/console:v2.8.0
+    container_name: redpanda-console
+    depends_on:
+      - redpanda-0
+    networks:
+      - redpanda_network
+    entrypoint: /bin/sh
+    command: >
+      -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml &&
+          /app/console -config.filepath=/tmp/config.yml'
+    environment:
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda-0:9092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://redpanda-0:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda-0:9644"]
+    ports:
+      - "8080:8080"
+
+  ###############################################################
+  # 3. POSTGRESQL
+  ###############################################################
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: marketdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - redpanda_network
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  ###############################################################
+  # 4. ADMINER (UI DB)
+  ###############################################################
+  adminer:
+    image: adminer:4
+    container_name: adminer-ui
+    depends_on:
+      - postgres
+    networks:
+      - redpanda_network
+    ports:
+      - "8090:8080"
+
+  ###############################################################
+  # 5. ALPHA VANTAGE FEED (Python → Kafka)
+  ###############################################################
+  alpha_feed:
+    build:
+      context: .
+      dockerfile: Dockerfile.alpha_feed
+    container_name: alpha-feed
+    depends_on:
+      - redpanda-0
+    environment:
+      API_KEY: "${API_KEY}"
+      KAFKA_BROKER: "redpanda-0:9092"
+      TOPIC: "market_data"
+    networks:
+      - redpanda_network
+
+  ###############################################################
+  # 6. ROUTER C++ (Kafka → PostgreSQL)
+  ###############################################################
+  router:
+    build:
+      context: .
+      dockerfile: Dockerfile.router
+    container_name: cpp-router
+    depends_on:
+      - redpanda-0
+      - postgres
+    environment:
+      BROKERS: "redpanda-0:9092"
+      TOPIC: "market_data"
+      DB_CONNINFO: "dbname=marketdb user=postgres password=admin host=postgres-db port=5432"
+      MODE: "1" # mode consumer dans ton main()
+    networks:
+      - redpanda_network
