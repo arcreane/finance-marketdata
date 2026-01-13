@@ -11,7 +11,7 @@ QT_BEGIN_NAMESPACE
 class QVBoxLayout;
 QT_END_NAMESPACE
 
-QT_CHARTS_USE_NAMESPACE
+//QT_CHARTS_USE_NAMESPACE
 
 // Widget de chart simple : affiche l'évolution de last_price
 // pour un seul symbole (le dernier reçu)

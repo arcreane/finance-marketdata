@@ -49,9 +49,6 @@
     <ClCompile Include="gui\KafkaConsumerQt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gui\main_gui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gui\MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MarketDataPrj", "MarketDataPrj\MarketDataPrj.vcxproj", "{AA68B109-8D74-4EB7-9F76-967C7180C36C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "librdkafka", "librdkafka\win32\librdkafka.vcxproj", "{4BEBB59C-477B-4F7A-8AE8-4228D0861E54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{AA68B109-8D74-4EB7-9F76-967C7180C36C}.Debug|x64.Build.0 = Debug|x64
 		{AA68B109-8D74-4EB7-9F76-967C7180C36C}.Release|x64.ActiveCfg = Release|x64
 		{AA68B109-8D74-4EB7-9F76-967C7180C36C}.Release|x64.Build.0 = Release|x64
+		{4BEBB59C-477B-4F7A-8AE8-4228D0861E54}.Debug|x64.ActiveCfg = Debug|x64
+		{4BEBB59C-477B-4F7A-8AE8-4228D0861E54}.Debug|x64.Build.0 = Debug|x64
+		{4BEBB59C-477B-4F7A-8AE8-4228D0861E54}.Release|x64.ActiveCfg = Release|x64
+		{4BEBB59C-477B-4F7A-8AE8-4228D0861E54}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

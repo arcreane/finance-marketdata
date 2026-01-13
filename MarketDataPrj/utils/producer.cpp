@@ -5,7 +5,7 @@
 
 Producer::Producer(const std::string& brokers, const std::string& topic)
 {
-    char errstr[512];
+   /* char errstr[512];
 
     conf_ = rd_kafka_conf_new();
 
@@ -33,22 +33,22 @@ Producer::Producer(const std::string& brokers, const std::string& topic)
     }
 
     std::cout << "[Producer] Ready on " << brokers
-        << " topic=" << topic << "\n";
+        << " topic=" << topic << "\n";*/
 }
 
 Producer::~Producer()
 {
-    if (rk_) {
-        rd_kafka_flush(rk_, 3000);
-        rd_kafka_topic_destroy(topic_);
-        rd_kafka_destroy(rk_);
-        // conf_ est libérée par rd_kafka_destroy
-    }
+    //if (rk_) {
+    //    rd_kafka_flush(rk_, 3000);
+    //    rd_kafka_topic_destroy(topic_);
+    //    rd_kafka_destroy(rk_);
+    //    // conf_ est libérée par rd_kafka_destroy
+    //}
 }
 
 void Producer::sendRaw(const std::string& msg)
 {
-    rd_kafka_resp_err_t err = rd_kafka_produce(
+    /*rd_kafka_resp_err_t err = rd_kafka_produce(
         topic_,
         RD_KAFKA_PARTITION_UA,
         RD_KAFKA_MSG_F_COPY,
@@ -64,7 +64,7 @@ void Producer::sendRaw(const std::string& msg)
             << rd_kafka_err2str(err) << "\n";
     }
 
-    rd_kafka_poll(rk_, 0);
+    rd_kafka_poll(rk_, 0);*/
 }
 
 void Producer::sendTick(const MarketDataTick& t)

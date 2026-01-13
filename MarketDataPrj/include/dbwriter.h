@@ -2,7 +2,7 @@
 #pragma once
 
 #include <string>
-#include <libpq-fe.h>
+//#include <libpq-fe.h>
 #include "marketdata.h"
 
 class DBWriter {
@@ -11,8 +11,8 @@ public:
     ~DBWriter();
 
     bool insertTick(const MarketDataTick& tick);
-    bool isConnected() const { return conn_ != nullptr; }
+    //bool isConnected() const { return conn_ != nullptr; }
 
 private:
-    PGconn* conn_ = nullptr;
+    //PGconn* conn_ = nullptr;
 };

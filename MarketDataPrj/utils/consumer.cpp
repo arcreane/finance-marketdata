@@ -27,7 +27,7 @@ Consumer::Consumer(const std::string& brokers,
 {
     char errstr[512];
 
-    conf_ = rd_kafka_conf_new();
+    /*conf_ = rd_kafka_conf_new();
 
     if (rd_kafka_conf_set(conf_, "bootstrap.servers",
         brokers.c_str(), errstr, sizeof(errstr))
@@ -68,25 +68,25 @@ Consumer::Consumer(const std::string& brokers,
     }
 
     std::cout << "[Consumer] Subscribed to " << topic
-        << " @ " << brokers << "\n";
+        << " @ " << brokers << "\n";*/
 }
 
 Consumer::~Consumer()
 {
     running_.store(false);
 
-    if (rk_) {
+  /*  if (rk_) {
         rd_kafka_consumer_close(rk_);
         rd_kafka_topic_partition_list_destroy(topics_);
         rd_kafka_destroy(rk_);
-    }
+    }*/
 }
 
 void Consumer::run()
 {
     std::cout << "[Consumer] Thread started.\n";
 
-    while (running_.load()) {
+   /* while (running_.load()) {
         rd_kafka_message_t* msg = rd_kafka_consumer_poll(rk_, 1000);
         if (!msg) continue;
 
@@ -107,7 +107,7 @@ void Consumer::run()
         }
 
         rd_kafka_message_destroy(msg);
-    }
+    }*/
 
     std::cout << "[Consumer] Thread stopping.\n";
 }

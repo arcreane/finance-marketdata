@@ -5,7 +5,7 @@
 
 DBWriter::DBWriter(const std::string& conninfo)
 {
-    conn_ = PQconnectdb(conninfo.c_str());
+    /*conn_ = PQconnectdb(conninfo.c_str());
 
     if (PQstatus(conn_) != CONNECTION_OK) {
         std::cerr << "[DB] Connection failed: "
@@ -15,20 +15,20 @@ DBWriter::DBWriter(const std::string& conninfo)
     }
     else {
         std::cout << "[DB] Connected to PostgreSQL.\n";
-    }
+    }*/
 }
 
 DBWriter::~DBWriter()
 {
-    if (conn_) {
+   /* if (conn_) {
         PQfinish(conn_);
         conn_ = nullptr;
-    }
+    }*/
 }
 
 bool DBWriter::insertTick(const MarketDataTick& t)
 {
-    if (!conn_) return false;
+   /* if (!conn_) return false;
 
     std::ostringstream ss;
     ss << "INSERT INTO ticks(symbol, ts, last_price, open, high, low, volume)"
@@ -50,7 +50,7 @@ bool DBWriter::insertTick(const MarketDataTick& t)
         return false;
     }
 
-    PQclear(res);
+    PQclear(res);*/
     return true;
 }
 

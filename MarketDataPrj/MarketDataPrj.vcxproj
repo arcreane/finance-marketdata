@@ -37,12 +37,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>Qt 6.7.2 MSVC2022_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;testlib;widgets;charts</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>Qt 6.7.2 MSVC2022_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;testlib;widgets;charts</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -63,6 +63,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)librdkafka\src</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)librdkafka\src</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -103,7 +113,6 @@
     <ClCompile Include="gui\DataTableModel.cpp" />
     <ClCompile Include="gui\KafkaConsumerQt.cpp" />
     <ClCompile Include="gui\MainWindow.cpp" />
-    <ClCompile Include="gui\main_gui.cpp" />
     <ClCompile Include="MarketDataPrj.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -130,6 +139,11 @@
     <None Include="redpanda\docker-compose.yml" />
     <None Include="simulation\alpha_vantage_feed.py" />
     <None Include="simulation\db_consumer.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\librdkafka\win32\librdkafka.vcxproj">
+      <Project>{9c34bd09-f543-1338-1e37-a15a00394dac}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

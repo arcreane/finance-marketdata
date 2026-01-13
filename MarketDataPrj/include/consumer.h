@@ -3,7 +3,7 @@
 
 #include <string>
 #include <atomic>
-#include <rdkafka.h>
+//#include <rdkafka.h>
 #include "marketdata.h"
 #include "tick_queue.h"
 
@@ -26,7 +26,7 @@ private:
     std::atomic<bool> running_{ true };
     TickQueue& queue_;
 
-    rd_kafka_t* rk_ = nullptr;
-    rd_kafka_conf_t* conf_ = nullptr;
-    rd_kafka_topic_partition_list_t* topics_ = nullptr;
+   // rd_kafka_t* rk_ = nullptr;
+   // rd_kafka_conf_t* conf_ = nullptr;
+   // rd_kafka_topic_partition_list_t* topics_ = nullptr;
 };

@@ -2,7 +2,7 @@
 #pragma once
 
 #include <string>
-#include <rdkafka.h>
+//#include <rdkafka.h>
 #include "marketdata.h"
 
 class Producer {
@@ -17,8 +17,8 @@ public:
     Producer& operator=(const Producer&) = delete;
 
 private:
-    rd_kafka_t* rk_ = nullptr;
-    rd_kafka_conf_t* conf_ = nullptr;
-    rd_kafka_topic_t* topic_ = nullptr;
+    //rd_kafka_t* rk_ = nullptr;
+    //rd_kafka_conf_t* conf_ = nullptr;
+    //rd_kafka_topic_t* topic_ = nullptr;
 };
 

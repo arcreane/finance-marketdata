@@ -43,7 +43,7 @@ private:
     std::thread worker_;
     std::atomic<bool> running_{ false };
 
-    rd_kafka_t* rk_ = nullptr;
-    rd_kafka_conf_t* conf_ = nullptr;
-    rd_kafka_topic_partition_list_t* topics_ = nullptr;
+   // rd_kafka_t* rk_ = nullptr;
+   // rd_kafka_conf_t* conf_ = nullptr;
+   // rd_kafka_topic_partition_list_t* topics_ = nullptr;
 };
