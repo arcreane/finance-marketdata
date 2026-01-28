@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QMainWindow>
 
@@ -8,11 +8,13 @@ class QTextEdit;
 #include "DataTableModel.h"
 #include "ChartWidget.h"
 #include "KafkaConsumerQt.h"
+#include "producer.h"   // 🔴 OBLIGATOIRE (Producer utilisé dans le .cpp)
 
 // MainWindow :
 // - Table de ticks
-// - Chart temps r�el
+// - Chart temps réel
 // - Zone de log
+// - Lancement Producer Alpha Vantage
 
 class MainWindow : public QMainWindow
 {
@@ -27,10 +29,15 @@ private slots:
     void handleLog(const QString& msg);
 
 private:
-    DataTableModel* model_;
-    QTableView* tableView_;
-    ChartWidget* chartWidget_;
-    QTextEdit* logView_;
+    // UI
+    DataTableModel* model_{ nullptr };
+    QTableView* tableView_{ nullptr };
+    ChartWidget* chartWidget_{ nullptr };
+    QTextEdit* logView_{ nullptr };
 
-    KafkaConsumerQt* kafka_;
+    // Kafka Consumer (UI)
+    KafkaConsumerQt* kafka_{ nullptr };
+
+    // Alpha Vantage Producer
+    Producer* producer_{ nullptr };
 };
