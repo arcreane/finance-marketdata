@@ -1,33 +1,25 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QObject>
 #include <QString>
-#include <thread>
 #include <atomic>
-#include <string>
+#include <thread>
 
 #include <rdkafka.h>
 
-#include "marketdata.h"
+#include "marketdata.h"   // âœ… ICI, PAS DE STRUCT LOCALE
 
-// KafkaConsumerQt : consomme un topic Kafka et émet un signal Qt à chaque tick.
-// Format attendu des messages (payload texte) :
-// symbol;last;open;high;low;volume;timestamp
-
-class KafkaConsumerQt : public QObject
-{
+class KafkaConsumerQt : public QObject {
     Q_OBJECT
 
 public:
     explicit KafkaConsumerQt(const QString& brokers,
         const QString& topic,
         QObject* parent = nullptr);
-    ~KafkaConsumerQt() override;
 
-    // Lance le thread de consommation
+    ~KafkaConsumerQt();
+
     void start();
-
-    // Arrêt propre
     void stop();
 
 signals:
@@ -35,17 +27,17 @@ signals:
     void logMessage(const QString& msg);
 
 private:
-    void run(); // fonction de thread
+    void run();
     MarketDataTick parseMessage(const std::string& msg);
 
 private:
     QString brokers_;
     QString topic_;
 
-    std::thread worker_;
-    std::atomic<bool> running_{ false };
+    rd_kafka_t* rk_{ nullptr };
+    rd_kafka_conf_t* conf_{ nullptr };
+    rd_kafka_topic_partition_list_t* topics_{ nullptr };
 
-    rd_kafka_t* rk_ = nullptr;
-    rd_kafka_conf_t* conf_ = nullptr;
-    rd_kafka_topic_partition_list_t* topics_ = nullptr;
+    std::atomic<bool> running_{ false };
+    std::thread worker_;
 };

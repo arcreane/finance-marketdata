@@ -15,11 +15,11 @@ public:
 
     ~Producer();
 
-    // Envoi Kafka
+    // === Kafka ===
     void sendRaw(const std::string& msg);
-    void sendTick(const MarketDataTick& tick);
+    void sendTick(const MarketDataTick& tick); // JSON
 
-    // Twelve Data
+    // === Twelve Data ===
     void startTwelveData(const std::string& symbol, int intervalSec = 60);
     void stop();
 

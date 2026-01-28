@@ -1,8 +1,10 @@
-// src/include/marketdata.h
+﻿// src/include/marketdata.h
 #pragma once
 
 #include <string>
 #include <cstdint>
+
+#include <QMetaType>   // 👈 AJOUT OBLIGATOIRE
 
 struct MarketDataTick {
     std::string  symbol;
@@ -13,3 +15,6 @@ struct MarketDataTick {
     std::int64_t volume = 0;
     std::int64_t timestamp = 0;   // epoch seconds
 };
+
+// 👇 LIGNE CRITIQUE POUR Qt (UNE SEULE FOIS)
+Q_DECLARE_METATYPE(MarketDataTick)

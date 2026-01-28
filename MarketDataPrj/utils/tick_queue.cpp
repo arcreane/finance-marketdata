@@ -1,4 +1,3 @@
-// src/utils/tick_queue.cpp
 #include "tick_queue.h"
 
 void TickQueue::push(const MarketDataTick& t)
@@ -13,7 +12,10 @@ void TickQueue::push(const MarketDataTick& t)
 bool TickQueue::pop(MarketDataTick& out)
 {
     std::unique_lock<std::mutex> lock(mtx_);
-    cv_.wait(lock, [&] { return stopping_ || !queue_.empty(); });
+
+    cv_.wait(lock, [&] {
+        return stopping_ || !queue_.empty();
+        });
 
     if (stopping_ && queue_.empty())
         return false;
@@ -25,6 +27,9 @@ bool TickQueue::pop(MarketDataTick& out)
 
 void TickQueue::stop()
 {
-    stopping_ = true;
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        stopping_ = true;
+    }
     cv_.notify_all();
 }

@@ -13,6 +13,24 @@
 
 using json = nlohmann::json;
 
+// ---------------- Kafka delivery report ----------------
+namespace {
+    void dr_msg_cb(rd_kafka_t* /*rk*/, const rd_kafka_message_t* rkmessage, void* /*opaque*/)
+    {
+        if (rkmessage->err) {
+            std::cerr << "[Kafka][DR] Delivery failed: "
+                << rd_kafka_message_errstr(rkmessage) << std::endl;
+        }
+        else {
+            std::cout << "[Kafka][DR] Delivered message to topic="
+                << rd_kafka_topic_name(rkmessage->rkt)
+                << " partition=" << rkmessage->partition
+                << " offset=" << rkmessage->offset
+                << std::endl;
+        }
+    }
+} // namespace
+
 // ---------------- HTTP utils ----------------
 static size_t write_cb(void* contents, size_t size, size_t nmemb, void* userp)
 {
@@ -65,10 +83,14 @@ Producer::Producer(const std::string& brokers,
         throw std::runtime_error(errstr);
     }
 
+    // ✅ callback delivery report (très utile)
+    rd_kafka_conf_set_dr_msg_cb(conf_, dr_msg_cb);
+
     rk_ = rd_kafka_new(RD_KAFKA_PRODUCER, conf_, errstr, sizeof(errstr));
     if (!rk_)
         throw std::runtime_error(errstr);
 
+    // ownership pris par librdkafka
     conf_ = nullptr;
 
     topic_ = rd_kafka_topic_new(rk_, topicName_.c_str(), nullptr);
@@ -84,16 +106,21 @@ Producer::~Producer()
     stop();
 
     if (rk_) {
-        rd_kafka_flush(rk_, 3000);
-        rd_kafka_topic_destroy(topic_);
+        // ✅ assure que tout est envoyé
+        rd_kafka_flush(rk_, 5000);
+
+        if (topic_) rd_kafka_topic_destroy(topic_);
         rd_kafka_destroy(rk_);
+
+        rk_ = nullptr;
+        topic_ = nullptr;
     }
 }
 
 // ---------------- Kafka send ----------------
 void Producer::sendRaw(const std::string& msg)
 {
-    if (msg.empty())
+    if (msg.empty() || !rk_ || !topic_)
         return;
 
     if (rd_kafka_produce(
@@ -108,23 +135,30 @@ void Producer::sendRaw(const std::string& msg)
     {
         std::cerr << "[Kafka] produce failed: "
             << rd_kafka_err2str(rd_kafka_last_error()) << std::endl;
+        return;
     }
 
-    rd_kafka_poll(rk_, 0);
+    // ✅ IMPORTANT : donner du temps à librdkafka pour envoyer + callback DR
+    rd_kafka_poll(rk_, 100);
 }
 
+// ✅ Maintenant on envoie du JSON (pas du CSV)
 void Producer::sendTick(const MarketDataTick& t)
 {
-    std::ostringstream ss;
-    ss << t.symbol << ";"
-        << t.last_price << ";"
-        << t.open << ";"
-        << t.high << ";"
-        << t.low << ";"
-        << t.volume << ";"
-        << t.timestamp;
+    json j;
+    j["symbol"] = t.symbol;
+    j["last"] = t.last_price;
+    j["open"] = t.open;
+    j["high"] = t.high;
+    j["low"] = t.low;
+    j["volume"] = t.volume;
+    j["timestamp"] = t.timestamp;
 
-    sendRaw(ss.str());
+    const std::string payload = j.dump();
+    sendRaw(payload);
+
+    // ✅ mode debug: on force l’envoi immédiat
+    rd_kafka_flush(rk_, 1000);
 }
 
 // ---------------- Twelve Data ----------------
@@ -172,7 +206,7 @@ void Producer::twelveDataLoop(const std::string& symbol, int intervalSec)
                 t.low = std::stod(v["low"].get<std::string>());
                 t.last_price = std::stod(v["close"].get<std::string>());
                 t.volume = std::stoll(v.value("volume", "0"));
-                t.timestamp = std::time(nullptr);
+                t.timestamp = static_cast<long long>(std::time(nullptr));
 
                 sendTick(t);
 
@@ -189,4 +223,3 @@ void Producer::twelveDataLoop(const std::string& symbol, int intervalSec)
 
     curl_global_cleanup();
 }
-
